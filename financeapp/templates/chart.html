@@ -1,0 +1,93 @@
+{% extends 'layout.html' %}
+
+{% block content  %}
+
+<main class="container" role="main">
+
+<h1 class="text-center"> Comparing YTD Stock Returns</h1>
+<canvas id="chartCanvas" width="400" height="200"></canvas>
+<form method="POST", action="" class="form-group">
+    {{ form.hidden_tag() }}
+{{ form.ticker1.label(class="btn-outline-info")}} {{ form.ticker1 }} <br>
+{{ form.ticker2.label }} {{ form.ticker2 }} <br>
+    <div class = "form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+<script>
+const ctx = document.getElementById('chartCanvas').getContext('2d');
+const data = {
+            labels : [{% for item in dates %}
+               new Date("{{ item }}"),
+              {% endfor %}],
+            datasets: [{
+                fill: false,
+                label: "{{ ticker }}",
+                data: [{% for item in prices %}
+                "{{ item }}", // Why do I need the comma here?? Huh
+                {% endfor %}],
+                borderColor: '#fe8b36',
+                backgroundColor: '#fe8b36',
+                lineTension: 0,
+                pointRadius: 0.5
+              },
+                {
+                    fill: false,
+                    label: "{{ ticker2 }}",
+                    data: [{%  for price in prices2  %}
+                       "{{ price }}",
+                        {%  endfor  %}
+                    ],
+                    borderColor: '#0f4c75',
+                    backgroundColor: '#0f4c75',
+                    pointRadius: 0.5,
+                    lineTension: 0
+                }
+            ]
+          }
+const options = {
+    type: 'line',
+    data: data,
+    options: {
+        fill: false,
+        responsive: true,
+        title: {
+            display: true,
+            text: "{{ ticker }}" + " vs " + "{{ ticker2 }}",
+            fontSize: 24
+        },
+        scales: {
+            xAxes: [{
+              time: {
+                unit: 'month' // Use this to adjust x labels
+              },
+                type: 'time',
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: "Date",
+                },
+              ticks: {
+                source: 'data'
+              }
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                },
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: "Ticker Price"
+                }
+            }]
+        }
+    }
+}
+const chart = new Chart(ctx, options);
+</script>
+</main>
+
+{% endblock content %}

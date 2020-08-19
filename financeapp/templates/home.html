@@ -1,0 +1,98 @@
+{% extends 'layout.html' %}
+
+{% block content  %}
+
+<main class="container" role="main">
+  <h1 class='text-center'> Nate Pruitt's Epic Finance Chart</h1>
+  <canvas id="myChart"></canvas>
+  <script>
+  //Chart.defaults.global.responsive = false;
+// define the chart data
+  var chartData = {
+    labels : [{% for item in labels %}
+               "{{ item }}",
+              {% endfor %}],
+    datasets : [{
+        label: "{{ legend }}",
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: "#0f4c75",
+        borderColor: "rgba(75,192,192,1)",
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderColor: "rgba(75,192,192,1)",
+        pointBackgroundColor: "#fff",
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "#0f4c75",
+        pointHoverBorderColor: "rgba(220,220,220,1)",
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data : [{% for item in data %}
+                  "{{item}}",
+                {% endfor %}],
+        spanGaps: false
+        },
+        {
+                    label: "Second Chart",
+        fill: false,
+        lineTension: 0.1,
+        hoverBorderColor: "rgba(220,220,200,1)",
+        hoveBackgroundColor: "rgba(220,220,200,1)",
+        backgroundColor: "rgba(75,192,192,0.4)",
+        borderColor: "rgba(75,192,192,1)",
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderColor: "rgba(75,192,192,1)",
+        pointBackgroundColor: "#fff",
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "rgba(220,220,220,1)",
+        pointHoverBorderColor:"rgba(75,192,192,1)" ,
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        data : [{% for item in data2 %}
+            "{{ item }}", // Why do I need the comma here?? Huh
+            {% endfor %}],
+        spanGaps: false
+        }]
+  }
+
+// get chart canvas
+  var ctx = document.getElementById("myChart").getContext("2d");
+
+// create the chart using the chart canvas
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: chartData,
+      options: {title: {display:true,text:"{{ stock1 }}" + " vs. " + "{{stock2}}", fontSize:20},
+                scales:{
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display:true,
+                            labelString:"% Change"
+                        }
+                    }],
+                    xAxes: [{
+                        display: true,
+                        scaleLabel :{
+                            display:true,
+                            labelString: "Day",
+                            fontSize: 22
+                        }
+                    }
+
+                    ]
+                }}
+  });
+</script>
+</main>
+
+{% endblock content %}
