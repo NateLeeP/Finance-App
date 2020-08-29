@@ -8,25 +8,29 @@
 <canvas id="chartCanvas" width="400" height="200"></canvas>
 <form method="POST", action="" class="form-group">
     {{ form.hidden_tag() }}
-{{ form.ticker1.label(class="btn-outline-info")}} {{ form.ticker1 }} <br>
+{{ form.ticker1.label }} {{ form.ticker1 }} <br>
 {{ form.ticker2.label }} {{ form.ticker2 }} <br>
+    {{ form.start.label }} {{ form.start }} <br>
+    {{ form.end.label }} {{ form.end }}
+
     <div class = "form-group">
         {{ form.submit(class="btn btn-outline-info") }}
     </div>
 
-
 </form>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
 <script>
+
 const ctx = document.getElementById('chartCanvas').getContext('2d');
 const data = {
-            labels : [{% for item in dates %}
+            labels : [{% for item in stock_dates_custom(form.ticker1.data, form.start.data, form.end.data) %}
                new Date("{{ item }}"),
               {% endfor %}],
             datasets: [{
                 fill: false,
-                label: "{{ ticker }}",
-                data: [{% for item in prices %}
+                label: "{{ form.ticker1.data }}",
+                data: [{% for item in stock_price_custom(form.ticker1.data,form.start.data, form.end.data) %}
                 "{{ item }}", // Why do I need the comma here?? Huh
                 {% endfor %}],
                 borderColor: '#fe8b36',
@@ -34,18 +38,17 @@ const data = {
                 lineTension: 0,
                 pointRadius: 0.5
               },
-                {
-                    fill: false,
-                    label: "{{ ticker2 }}",
-                    data: [{%  for price in prices2  %}
-                       "{{ price }}",
-                        {%  endfor  %}
-                    ],
-                    borderColor: '#0f4c75',
-                    backgroundColor: '#0f4c75',
-                    pointRadius: 0.5,
-                    lineTension: 0
-                }
+            {
+                fill: false,
+                label: "{{ form.ticker2.data }}",
+                data: [{% for item in stock_price_custom(form.ticker2.data, form.start.data, form.end.data) %}
+                "{{ item }}", // Why do I need the comma here?? Huh
+                {% endfor %}],
+                borderColor: '#0f4c75',
+                backgroundColor: '#0f4c75',
+                lineTension: 0,
+                pointRadius: 0.5
+              }
             ]
           }
 const options = {
@@ -56,13 +59,13 @@ const options = {
         responsive: true,
         title: {
             display: true,
-            text: "{{ ticker }}" + " vs " + "{{ ticker2 }}",
+            text: "{{ form.ticker1.data }}" + " vs " + "{{ form.ticker2.data }}",
             fontSize: 24
         },
         scales: {
             xAxes: [{
               time: {
-                unit: 'month' // Use this to adjust x labels
+                unit: "month"// Use this to adjust x labels
               },
                 type: 'time',
                 display: true,

@@ -8,3 +8,15 @@ body {
     color: blueviolet;
 }
 
+/*
+.form-control {
+    width: 30%;
+}
+
+ */
+
+.reduced-width {
+    width: 30%;
+}
+
+/* Check this out! Can override bootstrap defaults by naming them in your main.css file.

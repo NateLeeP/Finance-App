@@ -50,6 +50,44 @@ def stock_dates_ytd(ticker, timeFrame):
     dates = parse_dates(ticker_df)
     return dates
 
+def stock_price_custom(ticker, start, end):
+    # Separated price and date into two different functions. Attempting to get functions to work in Jinja template.
+    ticker = yfinance.Ticker(ticker)
+    # ticker_name = ticker.info['longName'] Attempt to pull in names, but not all tickers had info attribute
+    ticker_df = ticker.history(start=start, end=end)
+    dates = parse_dates(ticker_df)
+    prices = parse_prices(ticker_df)
+    return prices # ticker_name
+
+def stock_dates_custom(ticker, start, end):
+    ticker = yfinance.Ticker(ticker)
+    ticker_df = ticker.history(start=start, end=end)
+    dates = parse_dates(ticker_df)
+    return dates
+
+
+def stock_dates_combine(ticker, timeFrame='ytd', start=None, end=None):
+    ticker = yfinance.Ticker(ticker)
+    if start and end:
+        ticker_df = ticker.history(start=start, end=end)
+        dates = parse_dates(ticker_df)
+        return dates
+    else:
+        ticker_df = ticker.history(period=timeFrame)
+        dates = parse_dates(ticker_df)
+        return dates
+
+def stock_prices_combine(ticker, timeFrame='ytd', start=None, end=None):
+    ticker = yfinance.Ticker(ticker)
+    if start and end:
+        ticker_df = ticker.history(start=start, end=end)
+        prices = parse_prices(ticker_df)
+        return prices
+    else:
+        ticker_df = ticker.history(period=timeFrame)
+        prices = parse_prices(ticker_df)
+        return prices
+
 
 
 
