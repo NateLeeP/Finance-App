@@ -5,7 +5,7 @@ from financeapp.forms import StockForm
 import random
 import datetime
 
-@app.route('/')
+# Testing chart, not to be used as home page.
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     stock1 = 'TSLA'
@@ -32,7 +32,7 @@ def utility_processor():
     return dict(scale_unit=scale_unit)
 
 
-
+@app.route('/')
 @app.route('/chart', methods=["POST", "GET"])
 def chart():
     form = StockForm()
@@ -62,7 +62,7 @@ def utility_processor():
 
 
 """
-08.24.2020: No longer need these functions. One function handles prices/dates for predefined and custom date ranges. 
+08.24.2020: No longer need these functions. One function handles prices/dates for predefined and custom date ranges.
 @app.context_processor
 def utility_processor():
     def stock_price_ytd(ticker, timeFrame):
