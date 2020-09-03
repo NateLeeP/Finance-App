@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError
-import yfinance
+import requests
+
 class StockForm(FlaskForm):
     ticker1 = StringField('Ticker One', validators=[DataRequired(), Length(min=1, max=5,message='Ticker must be between 1-5 characters')])
     ticker2 = StringField('Ticker Two', validators=[DataRequired(), Length(min=1, max=5, message='Ticker must be between 1-5 characters')])
@@ -12,11 +13,11 @@ class StockForm(FlaskForm):
     submit = SubmitField('Update Graph')
 
     def validate_ticker1(self, ticker1):
-        if yfinance.Ticker(ticker1.data).history(period='ytd').empty:
+        if requests.get('https://sandbox.iexapis.com/stable/stock/' + ticker1.data + '/book?token=Tpk_8ef08bcd612444eab903cf6d1877b2bb').status_code == 404:
             raise ValidationError('Ticker does not exist.')
 
     def validate_ticker2(self, ticker2):
-        if yfinance.Ticker(ticker2.data).history(period='ytd').empty:
+        if requests.get('https://sandbox.iexapis.com/stable/stock/' + ticker2.data + '/book?token=Tpk_8ef08bcd612444eab903cf6d1877b2bb').status_code == 404:
             raise ValidationError('Ticker does not exist.')
 
 
