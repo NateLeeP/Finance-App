@@ -8,44 +8,97 @@
 <canvas id="chartCanvas" width="400" height="200"></canvas>
 <form method="POST", action="" class="form-group">
     {{ form.hidden_tag() }}
-{{ form.ticker1.label(class="btn-outline-info")}} {{ form.ticker1 }} <br>
-{{ form.ticker2.label }} {{ form.ticker2 }} <br>
-    <div class = "form-group">
+    {% if form.ticker1.errors %}
+        {{ form.ticker1(class='form-control is-invalid reduced-width')  }}
+        <div class="invalid-feedback">
+            {% for error in form.ticker1.errors %}
+                <span> {{ error }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ form.ticker1(class="form-control reduced-width", **{'aria-describedby':'tickerHelp1'}) }}
+        <small id='tickerHelp1' class="form-text text-muted"> Ticker 1 </small>
+    {% endif %}
+   <!-- {{ form.ticker2.label }} Removing label 08.26.2020 -->
+    {% if form.ticker2.errors %}
+        {{ form.ticker2(class='form-control is-invalid reduced-width') }}
+        <div class="invalid-feedback">
+            {% for error in form.ticker2.errors %}
+            <span>{{ error }} </span>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ form.ticker2(class='form-control reduced-width', placeholder='GOOG')}}
+        <small class="form-text text-muted">Ticker 2</small>
+    {% endif %}
+        {{ form.timeFrame(class='form-control reduced-width') }}
+    <div id="form01" class="row">
+        {% if form.timeFrame.data == 'custom' %}
+            <div class = 'col'>
+              {{ form.start(class='form-control', placeholder='YYYY-MM-DD') }}
+              <small class="form-text text-muted">Start Date</small>
+            </div>
+            <div class = 'col'>
+              {{ form.end(class='form-control', placeholder='YYYY-MM-DD') }}
+              <small class = "form-text text-muted">End Date</small>
+            </div>
+        {% endif %}
+   </div>
+    <div>
         {{ form.submit(class="btn btn-outline-info") }}
     </div>
 
-
 </form>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
 <script>
+
 const ctx = document.getElementById('chartCanvas').getContext('2d');
 const data = {
-            labels : [{% for item in dates %}
+            {% if form.start.data and form.end.data %}
+                labels : [{% for item in stock_dates_combine(form.ticker1.data, start=form.start.data, end=form.end.data) %}
+                new Date("{{ item }}"),
+                {% endfor %}],
+            {% else %}
+            labels : [{% for item in stock_dates_combine(form.ticker1.data, timeFrame=form.timeFrame.data) %}
                new Date("{{ item }}"),
-              {% endfor %}],
+               {% endfor %}],
+            {% endif %}
             datasets: [{
                 fill: false,
-                label: "{{ ticker }}",
-                data: [{% for item in prices %}
-                "{{ item }}", // Why do I need the comma here?? Huh
-                {% endfor %}],
+                label: "{{ form.ticker1.data }}",
+                {% if form.start.data and form.end.data %}
+                    data: [{% for item in stock_prices_combine(form.ticker1.data, start=form.start.data, end=form.end.data) %}
+                    "{{ item }}", // Why do I need the comma here?? Huh
+                    {% endfor %}],
+                {% else %}
+                    data: [{% for item in stock_prices_combine(form.ticker1.data, timeFrame=form.timeFrame.data) %}
+                    "{{ item }}", // Why do I need the comma here?? Huh
+                    {% endfor %}],
+                {% endif %}
                 borderColor: '#fe8b36',
                 backgroundColor: '#fe8b36',
                 lineTension: 0,
                 pointRadius: 0.5
               },
-                {
-                    fill: false,
-                    label: "{{ ticker2 }}",
-                    data: [{%  for price in prices2  %}
-                       "{{ price }}",
-                        {%  endfor  %}
-                    ],
-                    borderColor: '#0f4c75',
-                    backgroundColor: '#0f4c75',
-                    pointRadius: 0.5,
-                    lineTension: 0
-                }
+            {
+                fill: false,
+                label: "{{ form.ticker2.data }}",
+                {% if form.start.data and form.end.data %}
+                    data: [{% for item in stock_prices_combine(form.ticker2.data, start=form.start.data, end=form.end.data) %}
+                    "{{ item }}", // Why do I need the comma here?? Huh
+                    {% endfor %}],
+                {% else %}
+                    data: [{% for item in stock_prices_combine(form.ticker2.data, timeFrame=form.timeFrame.data) %}
+                    "{{ item }}", // Why do I need the comma here?? Huh
+                    {% endfor %}],
+                {% endif %}
+                borderColor: '#0f4c75',
+                backgroundColor: '#0f4c75',
+                lineTension: 0,
+                pointRadius: 0.5
+              }
             ]
           }
 const options = {
@@ -56,22 +109,23 @@ const options = {
         responsive: true,
         title: {
             display: true,
-            text: "{{ ticker }}" + " vs " + "{{ ticker2 }}",
+            text: "{{ form.ticker1.data }}" + " vs " + "{{ form.ticker2.data }}",
             fontSize: 24
         },
         scales: {
             xAxes: [{
               time: {
-                unit: 'month' // Use this to adjust x labels
+                unit: "month", // Use this to adjust x labels. 08.24.2020: Previously used { scale_unit(form.timeFrame.data
               },
                 type: 'time',
+                bounds: 'data',
                 display: true,
                 scaleLabel: {
                     display: true,
                     labelString: "Date",
                 },
               ticks: {
-                source: 'data'
+                source: 'label'
               }
             }],
             yAxes: [{
@@ -88,6 +142,23 @@ const options = {
     }
 }
 const chart = new Chart(ctx, options);
+</script>
+
+<script>
+
+    let time_select = document.getElementById('timeFrame')
+    let form = document.getElementById('form01')
+    time_select.onchange = function() {
+        if (time_select.value == 'custom')
+        {
+            form.innerHTML =  '<div class = col>' + '{{ form.start(class='form-control', placeholder='YYYY-MM-DD') }}' + '</div>' + '<div class = col>' + '{{ form.end(class='form-control', placeholder='YYYY-MM-DD') }}' + '</div>';
+        }
+        else
+        {
+            form.innerHTML ='';
+        }
+    }
+
 </script>
 </main>
 

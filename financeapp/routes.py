@@ -39,13 +39,13 @@ def chart():
     if form.validate_on_submit(): #Validate wtf_forms validators
         #if form.timeFrame.data == 'custom':
         #    return redirect(url_for('customTime')
-        return render_template('chartV2.html', title='Chart', form=form)
+        return render_template('chart.html', title='Chart', form=form)
 
     else:
         form.ticker1.data = "TSLA"
         form.ticker2.data = "GOOG"
         form.timeFrame.data = "ytd"
-        return render_template('chartV2.html', title='Chart', form=form)
+        return render_template('chart.html', title='Chart', form=form)
 
 
 @app.context_processor
