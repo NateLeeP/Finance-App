@@ -4,7 +4,7 @@
 
 <main class="container" role="main">
 
-<h1 class="text-center"> Comparing YTD Stock Returns</h1>
+<h1 class="text-center"> Comparing Stock Returns</h1>
 <canvas id="chartCanvas" width="400" height="200"></canvas>
 <form method="POST", action="" class="form-group">
     {{ form.hidden_tag() }}
@@ -16,8 +16,9 @@
             {% endfor %}
         </div>
     {% else %}
-        {{ form.ticker1(class="form-control reduced-width", **{'aria-describedby':'tickerHelp1'}) }}
-        <small id='tickerHelp1' class="form-text text-muted"> Ticker 1 </small>
+        {{ form.ticker1(class="form-control reduced-width", placeholder='TSLA', **{'aria-describedby':'tickerHelp1'}) }}
+        <small id='tickerHelp1' class="form-text text-muted">Ticker One</small>
+        <br>
     {% endif %}
    <!-- {{ form.ticker2.label }} Removing label 08.26.2020 -->
     {% if form.ticker2.errors %}
@@ -28,23 +29,26 @@
             {% endfor %}
         </div>
     {% else %}
-        {{ form.ticker2(class='form-control reduced-width', placeholder='GOOG')}}
-        <small class="form-text text-muted">Ticker 2</small>
+        {{ form.ticker2(class='form-control reduced-width', placeholder='GOOG', **{'aria-describedby':'tickerHelp2'})}}
+        <small class="form-text text-muted" id='tickerHelp2'>Ticker Two</small>
+        <br>
     {% endif %}
         {{ form.timeFrame(class='form-control reduced-width') }}
+        <small class="form-text text-muted">Time Frame</small>
     <div id="form01" class="row">
         {% if form.timeFrame.data == 'custom' %}
             <div class = 'col'>
-              {{ form.start(class='form-control', placeholder='YYYY-MM-DD') }}
+              {{ form.start(class='form-control reduced-width', placeholder='YYYY-MM-DD') }}
               <small class="form-text text-muted">Start Date</small>
             </div>
             <div class = 'col'>
-              {{ form.end(class='form-control', placeholder='YYYY-MM-DD') }}
+              {{ form.end(class='form-control reduced-width', placeholder='YYYY-MM-DD') }}
               <small class = "form-text text-muted">End Date</small>
             </div>
         {% endif %}
    </div>
     <div>
+        <br>
         {{ form.submit(class="btn btn-outline-info") }}
     </div>
 
@@ -135,7 +139,7 @@ const options = {
                 display: true,
                 scaleLabel: {
                     display: true,
-                    labelString: "Ticker Price"
+                    labelString: "Period Return (%)"
                 }
             }]
         }
@@ -151,7 +155,7 @@ const chart = new Chart(ctx, options);
     time_select.onchange = function() {
         if (time_select.value == 'custom')
         {
-            form.innerHTML =  '<div class = col>' + '{{ form.start(class='form-control', placeholder='YYYY-MM-DD') }}' + '</div>' + '<div class = col>' + '{{ form.end(class='form-control', placeholder='YYYY-MM-DD') }}' + '</div>';
+            form.innerHTML =  '<div class = col>' + '{{ form.start(class='form-control reduced-width', placeholder='YYYY-MM-DD') }}' + '<small class="form-text text-muted">Start Date</small>' + '</div>' + '<div class = col>' + '{{ form.end(class='form-control reduced-width', placeholder='YYYY-MM-DD') }}' + '<small class="form-text text-muted">End Date</small>' + '</div>';
         }
         else
         {
