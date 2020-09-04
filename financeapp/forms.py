@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, DateField
+from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FieldList, FormField
 from wtforms.validators import DataRequired, Length, ValidationError
 import requests
 
@@ -19,6 +19,17 @@ class StockForm(FlaskForm):
     def validate_ticker2(self, ticker2):
         if requests.get('https://sandbox.iexapis.com/stable/stock/' + ticker2.data + '/book?token=Tpk_8ef08bcd612444eab903cf6d1877b2bb').status_code == 404:
             raise ValidationError('Ticker does not exist.')
+
+
+class PortfolioEntry(FlaskForm):
+    ticker = StringField('Ticker', validators=[DataRequired(), Length(min=1, max=5, message='Ticker must be between 1-5 characters')])
+    shares = IntegerField('Number of shares', validators=[DataRequired()])
+
+class PortfolioHoldings(FlaskForm):
+    holdings = FieldList(FormField(PortfolioEntry), min_entries=1)
+
+
+
 
 
 """
