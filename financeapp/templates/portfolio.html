@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content  %}
+
+{% for portfolio_entry in form.holdings %}
+  {{portfolio_entry.hidden_tag()}}
+  {{portfolio_entry.ticker.data}} <br>
+  {{portfolio_entry.shares.data}}
+
+{% endfor %}
+
+{% endblock content %}
