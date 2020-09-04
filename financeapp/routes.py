@@ -1,7 +1,7 @@
 from financeapp import app
 from flask import render_template, redirect, url_for
 from financeapp import stock_prices
-from financeapp.forms import StockForm
+from financeapp.forms import StockForm, PortfolioHoldings
 import random
 import datetime
 
@@ -46,6 +46,12 @@ def chart():
         form.ticker2.data = "GOOG"
         form.timeFrame.data = "ytd"
         return render_template('chart.html', title='Chart', form=form)
+
+@app.route('/portfolio', methods=["POST", "GET"])
+def portfolio():
+    holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
+    form = PortfolioHoldings(holdings=holdings)
+    return render_template('portfolio.html', title='Portfolio', form=form)
 
 
 @app.context_processor
