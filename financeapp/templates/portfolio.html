@@ -4,8 +4,8 @@
 
 {% for portfolio_entry in form.holdings %}
   {{portfolio_entry.hidden_tag()}}
-  {{portfolio_entry.ticker.data}} <br>
-  {{portfolio_entry.shares.data}}
+  {{portfolio_entry.ticker.label}} {{portfolio_entry.ticker}}<br>
+  {{portfolio_entry.shares.label}} {{portfolio_entry.shares}}
 
 {% endfor %}
 
