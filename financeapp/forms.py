@@ -27,6 +27,7 @@ class PortfolioEntry(FlaskForm):
 
 class PortfolioHoldings(FlaskForm):
     holdings = FieldList(FormField(PortfolioEntry), min_entries=1)
+    submit = SubmitField('Submit Holdings')
 
 
 

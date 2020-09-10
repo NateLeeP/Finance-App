@@ -18,5 +18,8 @@ body {
 .reduced-width {
     width: 30%;
 }
+.is-hidden {
+    display:none;
+}
 
 /* Check this out! Can override bootstrap defaults by naming them in your main.css file.
