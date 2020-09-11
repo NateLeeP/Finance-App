@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content  %}
+<canvas id="chartCanvas" width="400" height="200"></canvas>
+
+{% for subform in form.holdings %}
+  <p>{{subform.ticker.data}} {{subform.shares.data}}</p>
+{% endfor %}
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+  <script>
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    const options = {
+      type:'pie',
+      data: {
+        datasets: [{
+          data: [{% for subform in form.holdings %}
+                  "{{subform.shares.data}}",
+                  {% endfor %}],
+          backgroundColor:["rgb(225, 99, 132)", "rgb(54, 162, 235)"]
+        }],
+        labels: [{% for subform in form.holdings %}
+                  "{{ subform.ticker.data }}",
+                  {% endfor %}]
+      }
+    }
+
+
+    const chart = new Chart(ctx, options);
+  </script>
+
+
+{% endblock content %}
