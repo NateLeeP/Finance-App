@@ -3,11 +3,13 @@
 {% block content  %}
 <a id="add" href="#">Add Holding</a>
 
-<form action=''>
-  {{form.hidden_tag()}}
+<form method='POST'>
+  {{form.csrf_token}}
   <div id='subforms-container'>
     {% for portfolio_entry in form.holdings %}
       <div id="holding-{{loop.index0}}-form" class="subform" data-index="{{loop.index0}}">
+        {{portfolio_entry.csrf_token}}
+
         {{portfolio_entry.ticker.label}} {{portfolio_entry.ticker}}<br>
         {{portfolio_entry.shares.label}} {{portfolio_entry.shares}}
 
@@ -19,6 +21,7 @@
 </form>
 
 <div id="holding-_-form" class="is-hidden" data-index="_">
+  <input id = "holdings-_-csrf_token" name = "holdings-_-csrf_token" type="hidden" value="">
   <label for="holdings-_-ticker">Ticker Symbol</label>
   <input id="holdings-_-ticker" name="holdings-_-ticker" type="text" value="">
   <br>
@@ -102,6 +105,7 @@ function addForm() {
     // Append
     $('#subforms-container').append($newForm);
     $newForm.addClass('subform');
+    $newForm.find('input').first().attr('value', $('form').children().first().attr('value'))
     $newForm.removeClass('is-hidden');
 
     $newForm.find('.remove').click(removeForm);
