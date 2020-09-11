@@ -49,9 +49,12 @@ def chart():
 
 @app.route('/portfolio', methods=["POST", "GET"])
 def portfolio():
-    holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
-    form = PortfolioHoldings(holdings=holdings)
-    return render_template('portfolio.html', title='Portfolio', form=form)
+    #holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
+    form = PortfolioHoldings()
+    if form.validate_on_submit():
+        return render_template('portfoliotest.html', form=form)
+    else:
+        return render_template('portfolio.html', title='Portfolio', form=form)
 
 
 @app.context_processor
