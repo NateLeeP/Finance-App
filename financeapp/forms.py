@@ -22,11 +22,11 @@ class StockForm(FlaskForm):
 
 
 class PortfolioEntry(FlaskForm):
-    ticker = StringField('Ticker', validators=[DataRequired(), Length(min=1, max=5, message='Ticker must be between 1-5 characters')])
+    ticker = StringField('Ticker', validators=[DataRequired()])
     shares = IntegerField('Number of shares', validators=[DataRequired()])
 
 class PortfolioHoldings(FlaskForm):
-    holdings = FieldList(FormField(PortfolioEntry), min_entries=1)
+    holdings = FieldList(FormField(PortfolioEntry), validators=[DataRequired()], min_entries=1)
     submit = SubmitField('Submit Holdings')
 
 
