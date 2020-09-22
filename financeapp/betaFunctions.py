@@ -31,8 +31,16 @@ def getPrice(ticker):
   return price
 
 def getMultiplePrice(arrayOfTickers):
-
   for ticker in arrayOfTickers:
     ticker['Market_Value'] = getPrice(ticker) * ticker['Shares']
+
+def getPortfolioValue(arrayOfTickers):
+  totalPortfolioValue = sum([ticker['Market_Value'] for ticker in arrayOfTickers])
+  return totalPortfolioValue
+
+def getPortfolioPercentage(arrayOfTickers, portfolioValue):
+  for ticker in arrayOfTickers:
+    ticker['%_of_Portfolio'] = ticker['Market_Value'] / portfolioValue
+
 
 
