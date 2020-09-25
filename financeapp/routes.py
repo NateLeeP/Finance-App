@@ -1,7 +1,9 @@
 from financeapp import app
 from flask import render_template, redirect, url_for
 from financeapp import stock_prices
+from financeapp import betaFunctions
 from financeapp.forms import StockForm, PortfolioHoldings
+from financeapp import dateLookUp
 import random
 import datetime
 
@@ -31,13 +33,12 @@ def utility_processor():
 
     return dict(scale_unit=scale_unit)
 
-
 @app.route('/')
 @app.route('/chart', methods=["POST", "GET"])
 def chart():
     form = StockForm()
     if form.validate_on_submit(): #Validate wtf_forms validators
-        #if form.timeFrame.data == 'custom':
+        #    if form.timeFrame.data == 'custom':
         #    return redirect(url_for('customTime')
         return render_template('chart.html', title='Chart', form=form)
 
@@ -52,7 +53,17 @@ def portfolio():
     #holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
     form = PortfolioHoldings()
     if form.validate_on_submit():
-        return render_template('portfoliotest.html', form=form)
+        tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
+        betaFunctions.getMultipleBeta(tickers)
+        betaFunctions.getMultiplePrice(tickers)
+        betaFunctions.getPortfolioPercentage(tickers, betaFunctions.getPortfolioValue(tickers))
+        betaFunctions.getCAPM(tickers, -56)
+        totalExpectedReturn = float("{:.2f}".format(betaFunctions.portfolioExpectedReturn(tickers)))
+        newTotalPortfolioValue = betaFunctions.getPortfolioValue(tickers) * (1 + (totalExpectedReturn/100))
+        beginTotalPortfolioValue= betaFunctions.getPortfolioValue(tickers)
+        requiredReturn = betaFunctions.calculateRequiredReturn(beginTotalPortfolioValue, newTotalPortfolioValue)
+        daysToRecover = dateLookUp.daysLookUp(requiredReturn)
+        return render_template('portfoliotest.html', form=form, betas=tickers, totalExpectedReturn=abs(totalExpectedReturn), beginTotalPortfolioValue="${:,.2f}".format(beginTotalPortfolioValue), newTotalPortfolioValue="${:,.2f}".format(newTotalPortfolioValue), requiredReturn="{:.2f}".format(requiredReturn), daysToRecover=daysToRecover)
     else:
         return render_template('portfolio.html', title='Portfolio', form=form)
 
