@@ -22,4 +22,53 @@ body {
     display:none;
 }
 
+.center {
+    display:block;
+    margin:auto;
+    width:25%;
+    text-align:center;
+    padding:10px;
+}
+
+.my-container {
+    border: 1px dotted blue;
+}
+/*
+.my-row {
+    border: 3px solid green
+}
+.my-col {
+    border:3px dotted red;
+}
+.col-right {
+    margin-right: 45%;
+}
+*/
 /* Check this out! Can override bootstrap defaults by naming them in your main.css file.
+
+/***************
+
+Text and Fonts
+
+****************/
+
+.font-xxlarge {
+    font-size: xx-large;
+}
+.font-less-bold {
+    font-weight: 400;
+}
+
+.font-bold {
+    font-weight:bold;
+}
+
+/*************
+
+Colors
+
+*************/
+
+.color-red {
+    color: red;
+}
