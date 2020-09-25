@@ -1,34 +1,67 @@
 {% extends 'layout.html' %}
 
 {% block content  %}
-<a id="add" href="#">Add Holding</a>
-
-<form method='POST'>
-  {{form.csrf_token}}
-  <div id='subforms-container'>
-    {% for portfolio_entry in form.holdings %}
-      <div id="holding-{{loop.index0}}-form" class="subform" data-index="{{loop.index0}}">
-        {{portfolio_entry.csrf_token}}
-
-        {{portfolio_entry.ticker.label}} {{portfolio_entry.ticker}}<br>
-        {{portfolio_entry.shares.label}} {{portfolio_entry.shares}}
-
-        <a class="remove" href="#">Remove Holding</a>
+<h3 class='text-center font-less-bold'>Wonder how your portfolio would fare against a major recession?</h3>
+<h5 class='text-center text-muted font-less-bold'>Input your holdings and see how it stacks up against historical market downturns!</h5>
+<div class='container my-container'>
+  <div>
+    <div class="row justify-content-center my-row">
+      <div class="col-4 my-col ">
+        <p class='font-xxlarge text-center'>Ticker Symbol</p>
       </div>
-    {% endfor %}
+      <div class="col-4 my-col ">
+        <p class='font-xxlarge text-center'>Shares</p>
+      </div>
+      <div class='col-2 my-col'>
+
+      </div>
+    </div>
   </div>
-  {{form.submit}}
-</form>
 
-<div id="holding-_-form" class="is-hidden" data-index="_">
+  <form method='POST'>
+    {{form.csrf_token}}
+    <div id='subforms-container'>
+      {% for portfolio_entry in form.holdings %}
+        <div id="holding-{{loop.index0}}-form" class="subform form-row justify-content-center my-row" data-index="{{loop.index0}}">
+          {{portfolio_entry.csrf_token}}
+          <div class ="form-group col-4 my-col">
+          <!--{{portfolio_entry.ticker.label}}--> {{portfolio_entry.ticker(class='form-control')}}
+          </div>
+          <div class = "form-group col-4 my-col">
+          <!--{{portfolio_entry.shares.label}}--> {{portfolio_entry.shares(class='form-control')}}
+          </div>
+          <button type='button' class='remove form-control col-2 btn btn-primary my-col'>Remove Holding</button>
+          <!--<a class="remove" href="#">Remove Holding</a>-->
+        </div>
+      {% endfor %}
+    </div>
+    <div class="form-row">
+      <div class='form-group col-2 offset-1'>
+        {{form.submit(class='btn btn-primary')}}
+      </div>
+      <div class='form-group col-2'>
+        <button type='button' class='btn btn-primary' id='add'>Add Holding</button>
+      </div>
+
+    </div>
+  </form>
+</div>
+<!--<a class = "row justify-content-center" id="add" href="#">Add Holding</a>-->
+
+
+<div id="holding-_-form" class="is-hidden form-row justify-content-center" data-index="_">
   <input id = "holdings-_-csrf_token" name = "holdings-_-csrf_token" type="hidden" value="">
-  <label for="holdings-_-ticker">Ticker Symbol</label>
-  <input id="holdings-_-ticker" name="holdings-_-ticker" type="text" value="">
-  <br>
-  <label for="holdings-_-shares">Number of Shares</label>
-  <input id="holdings-_-shares" name="holdings-_-shares" type="text">
+  <!--<label for="holdings-_-ticker">Ticker Symbol</label><-->
+  <div class="form-group col-4">
+  <input class='form-control'id="holdings-_-ticker" name="holdings-_-ticker" type="text" value="">
+  </div>
+  <!--<label for="holdings-_-shares"></label>-->
+  <div class='form-group col-4'>
+  <input class='form-control' id="holdings-_-shares" name="holdings-_-shares" type="text">
+  </div>
+  <!--<input type='button' class='remove form-group col-sm-1 btn btn-primary' value='Remove Holding'>-->
 
-  <a class="remove" href="#">Remove Holding</a>
+  <button type='button' class='remove form-control col-2 btn btn-primary my-col' value='Remove Holding'>Remove Holding</button>
 </div>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script>
