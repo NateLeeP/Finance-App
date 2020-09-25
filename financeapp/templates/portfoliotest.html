@@ -1,35 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content  %}
-<canvas id="chartCanvas" width="400" height="200"></canvas>
-
-{% for subform in form.holdings %}
-  <p>{{subform.ticker.data}} {{subform.shares.data}}</p>
-{% endfor %}
-
-
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
-  <script>
-    const ctx = document.getElementById('chartCanvas').getContext('2d');
-    const options = {
-      type:'pie',
-      data: {
-        datasets: [{
-          data: [{% for subform in form.holdings %}
-                  "{{subform.shares.data}}",
-                  {% endfor %}],
-          backgroundColor:["rgb(225, 99, 132)", "rgb(54, 162, 235)"]
-        }],
-        labels: [{% for subform in form.holdings %}
-                  "{{ subform.ticker.data }}",
-                  {% endfor %}]
-      }
-    }
-
-
-    const chart = new Chart(ctx, options);
-  </script>
-
+<h2 class='text-center font-less-bold'>2008 Financial Crisis</h2>
+<p class='text-center'>From a high on October 9th, 2007, the S&P 500 fell 56% before bottoming out on March 8th, 2009. Based on latest price estimates, your portfolio is worth <span class='font-bold'>{{beginTotalPortfolioValue}} </span>. If we experienced a similar market decline, your portfolio would drop <span class='color-red font-bold'>{{totalExpectedReturn}}% </span>, for a new portfolio value of <span class='font-bold'>{{newTotalPortfolioValue}}</span>. In order to return to your previous portfolio value of <span class='font-bold'>{{beginTotalPortfolioValue}}</span>, your portfolio would need to return <span class='font-bold'>{{requiredReturn}}%</span>. Based on the 2008 Financial Crisis recover, you would return to previous values in <span class='font-bold'>{{daysToRecover}} </span> days.</p>
 
 {% endblock content %}
