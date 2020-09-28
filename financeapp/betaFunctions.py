@@ -44,6 +44,13 @@ def getPortfolioPercentage(arrayOfTickers, portfolioValue):
   for ticker in arrayOfTickers:
     ticker['%_of_Portfolio'] = ticker['Market_Value'] / portfolioValue
 
+def getPortfolioBeta(arrayOfTickers):
+  beta = 0
+  for ticker in arrayOfTickers:
+    beta += ticker['%_of_Portfolio'] * ticker['Beta']
+  return beta
+
+
 def getCAPM(arrayOfTickers, expectedMarketReturn):
   for ticker in arrayOfTickers:
     # Expected return using CAPM. Formula for CAPM is Expected Return = Risk-Free Rate + Beta(Expected Market Return - Risk-Free Rate)

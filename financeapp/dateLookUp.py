@@ -30,18 +30,20 @@ def convertToDate(dateString):
   return datetime.date(year, month, day)
 
 def adjustPriceArray(beta):
-  for i in range(len(price_array)):
-    price_array[i]['Change'] *= beta
+  adjustedPriceArray = price_array.copy()
+  for i in range(len(adjustedPriceArray)):
+    adjustedPriceArray[i]['Change'] *= beta
 
-  return price_array
+  return adjustedPriceArray
 
 
-def daysLookUp(required_return, beta):
+def daysLookUp(required_return, portfolio_beta):
   date = ''
-  price_array = adjustPriceArray(beta)
-  for i in range(len(price_array)):
-    if price_array[i]['Change'] > required_return:
-      date = convertToDate(price_array[i]['Date'])
+  adjustPriceArray = adjustPriceArray(portfolio_beta)
+  for i in range(len(adjustPriceArray)):
+    if adjustPriceArray[i]['Change'] > required_return:
+      date = convertToDate(adjustPriceArray[i]['Date'])
       break
   return (date - datetime.date(2009, 3, 8)).days
 
+print(adjustPriceArray(1.2))

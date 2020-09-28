@@ -62,7 +62,7 @@ def portfolio():
         newTotalPortfolioValue = betaFunctions.getPortfolioValue(tickers) * (1 + (totalExpectedReturn/100))
         beginTotalPortfolioValue= betaFunctions.getPortfolioValue(tickers)
         requiredReturn = betaFunctions.calculateRequiredReturn(beginTotalPortfolioValue, newTotalPortfolioValue)
-        daysToRecover = dateLookUp.daysLookUp(requiredReturn)
+        daysToRecover = dateLookUp.daysLookUp(requiredReturn, betaFunctions.getPortfolioBeta(tickers))
         return render_template('portfoliotest.html', form=form, betas=tickers, totalExpectedReturn=abs(totalExpectedReturn), beginTotalPortfolioValue="${:,.2f}".format(beginTotalPortfolioValue), newTotalPortfolioValue="${:,.2f}".format(newTotalPortfolioValue), requiredReturn="{:.2f}".format(requiredReturn), daysToRecover=daysToRecover)
     else:
         return render_template('portfolio.html', title='Portfolio', form=form)
