@@ -1,5 +1,6 @@
 import csv
 import datetime
+import copy
 price_array = []
 with open('financeapp/sp500returns.csv', mode='r') as csv_file:
   csv_reader = csv.reader(csv_file, delimiter=',')
@@ -22,15 +23,14 @@ for i in range(len(price_array)):
     price_array[i]['Change'] = ((price_array[i]['Price'] - base_price) / base_price) * 100
 
 
-
 def convertToDate(dateString):
   year = int(dateString.split('-')[0])
   month = int(dateString.split('-')[1].lstrip('0'))
   day = int(dateString.split('-')[2].lstrip('0'))
   return datetime.date(year, month, day)
 
-def adjustPriceArray(beta):
-  adjustedPriceArray = price_array.copy()
+def adjustPriceArrayFunc(beta):
+  adjustedPriceArray = price_array[:]
   for i in range(len(adjustedPriceArray)):
     adjustedPriceArray[i]['Change'] *= beta
 
@@ -39,11 +39,21 @@ def adjustPriceArray(beta):
 
 def daysLookUp(required_return, portfolio_beta):
   date = ''
-  adjustPriceArray = adjustPriceArray(portfolio_beta)
+  adjustPriceArray = copy.deepcopy(price_array)
+  # 'deepcopy' ensures dictionairies in list are copied. Need to copy, python passes everything by reference.
+  print(price_array[:5])
+  for i in range(len(adjustPriceArray)):
+    adjustPriceArray[i]['Change'] *= portfolio_beta
   for i in range(len(adjustPriceArray)):
     if adjustPriceArray[i]['Change'] > required_return:
       date = convertToDate(adjustPriceArray[i]['Date'])
       break
+  del adjustPriceArray
   return (date - datetime.date(2009, 3, 8)).days
 
-print(adjustPriceArray(1.2))
+def recoveryDate(days):
+  # Accepts recovery days and returns date of recovery (as string)
+  return (datetime.date.today() + datetime.timedelta(days=days)).strftime("%B %d, %Y")
+
+def test():
+  print(price_array[:5])
