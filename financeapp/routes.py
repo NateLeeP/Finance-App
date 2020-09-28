@@ -54,28 +54,22 @@ def portfolio():
     form = PortfolioHoldings()
     if form.validate_on_submit():
         tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
-        betaFunctions.getMultipleBeta(tickers)
-        betaFunctions.getMultiplePrice(tickers)
-        betaFunctions.getPortfolioPercentage(tickers, betaFunctions.getPortfolioValue(tickers))
-        betaFunctions.getCAPM(tickers, -56)
-        totalExpectedReturn = float("{:.2f}".format(betaFunctions.portfolioExpectedReturn(tickers)))
-        newTotalPortfolioValue = betaFunctions.getPortfolioValue(tickers) * (1 + (totalExpectedReturn/100))
-        beginTotalPortfolioValue= betaFunctions.getPortfolioValue(tickers)
-        requiredReturn = betaFunctions.calculateRequiredReturn(beginTotalPortfolioValue, newTotalPortfolioValue)
-        daysToRecover = dateLookUp.daysLookUp(requiredReturn, betaFunctions.getPortfolioBeta(tickers))
-        return render_template('portfoliotest.html', form=form, betas=tickers, totalExpectedReturn=abs(totalExpectedReturn), beginTotalPortfolioValue="${:,.2f}".format(beginTotalPortfolioValue), newTotalPortfolioValue="${:,.2f}".format(newTotalPortfolioValue), requiredReturn="{:.2f}".format(requiredReturn), daysToRecover=daysToRecover)
+        betaFunctions.updateTickerList(tickers)
+        calculations = betaFunctions.portfolioCalculations(tickers)
+        return render_template('portfoliotest.html', form=form, betas=tickers, calculations=calculations)
     else:
         return render_template('portfolio.html', title='Portfolio', form=form)
 
 
+
 @app.context_processor
-def utility_processor():
+def stock_date_processor():
     def stock_dates_combine(ticker, timeFrame='ytd', start=None, end=None):
         return stock_prices.stock_dates_combine(ticker, timeFrame, start, end)
     return dict(stock_dates_combine=stock_dates_combine)
 
 @app.context_processor
-def utility_processor():
+def stock_price_processor():
     def stock_prices_combine(ticker, timeFrame='ytd', start=None, end=None):
         return stock_prices.stock_prices_combine(ticker, timeFrame, start, end) # 08.24.2020 Notice: Do not have to pass the defaults a second time!!
     return dict(stock_prices_combine=stock_prices_combine)
