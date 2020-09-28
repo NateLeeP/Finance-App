@@ -1,4 +1,5 @@
 import requests
+from financeapp import dateLookUp as dl
 
 #api_token = 'btkmg5v48v6qjthfm1t0'
 api_token = 'pk_8d0f8e5a2a134ad48410c868b4849d70'
@@ -70,3 +71,29 @@ def calculateRequiredReturn(new_portfolio_value, old_portfolio_value):
   requiredReturn = (float(new_portfolio_value) / float(old_portfolio_value)) - 1
   requiredReturn *= 100
   return requiredReturn
+
+def updateTickerList(tickers):
+  # Calculate beta, market value, portfolio percentage, and expected return
+  getMultipleBeta(tickers)
+  getMultiplePrice(tickers)
+  getPortfolioPercentage(tickers, getPortfolioValue(tickers))
+  getCAPM(tickers, -56)
+
+  return tickers
+
+def portfolioCalculations(tickers):
+  # Calculate (and store) expected return, beginning and ending portfolio value, required return, and days to recover
+  calculations = {}
+  totalExpectedReturn = float(portfolioExpectedReturn(tickers))
+  endTotalPortfolioValue = getPortfolioValue(tickers) * (1 + (totalExpectedReturn/100))
+  startTotalPortfolioValue= getPortfolioValue(tickers)
+  requiredReturn = calculateRequiredReturn(startTotalPortfolioValue, endTotalPortfolioValue)
+  daysToRecover = dl.daysLookUp(requiredReturn, 1.2)
+  calculations['totalExpectedReturn'] = '{:.2f}'.format(totalExpectedReturn)
+  calculations['endTotalPortfolioValue'] = '${:,.2f}'.format(endTotalPortfolioValue)
+  calculations['startTotalPortfolioValue'] = '${:,.2f}'.format(startTotalPortfolioValue)
+  calculations['requiredReturn'] = '{:.2f}'.format(requiredReturn)
+  calculations['daysToRecover'] = daysToRecover
+  calculations['recoveryDate'] = dl.recoveryDate(daysToRecover)
+
+  return calculations
