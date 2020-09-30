@@ -1,8 +1,10 @@
-from financeapp import app
-from flask import render_template, redirect, url_for
+from financeapp import app, db
+from financeapp.models import User, Portfolio, Holding
+from flask import render_template, redirect, url_for, flash
+from flask_login import current_user, login_user, logout_user, login_required
 from financeapp import stock_prices
 from financeapp import betaFunctions
-from financeapp.forms import StockForm, PortfolioHoldings
+from financeapp.forms import StockForm, PortfolioHoldings, RegistrationForm, LoginForm, PortfolioEntry
 from financeapp import dateLookUp
 import random
 import datetime
@@ -50,8 +52,17 @@ def chart():
 
 @app.route('/portfolio', methods=["POST", "GET"])
 def portfolio():
-    #holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
+    holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
+
+    if current_user.is_authenticated:
+        u = User.query.filter_by(id=current_user.get_id()).first()
+        if u.portfolios.first() is not None:
+            p = u.portfolios.first()
+            for holding in p.holdings.all():
+                form.holdings.append_entry({'ticker':holding.ticker, 'shares':holding.shares})
+
     form = PortfolioHoldings()
+    form.holdings[0]
     if form.validate_on_submit():
         tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
         betaFunctions.updateTickerList(tickers)
@@ -60,6 +71,43 @@ def portfolio():
     else:
         return render_template('portfolio.html', title='Portfolio', form=form)
 
+@app.route('/disclaimer', methods=["GET"])
+def disclaimer():
+    return render_template('calculationDisclaimer.html')
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        u = User.query.filter_by(email=form.email.data).first()
+        if u and u.check_password(form.password.data):
+            login_user(u)
+            flash("You have logged in successfully!", "success")
+            return redirect(url_for('chart'))
+        else:
+            flash('Invalid email or password', 'danger')
+            #return redirect(url_for('login'))
+    return render_template('login.html', form=form)
+
+@app.route('/register', methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        u = User(username=form.username.data, email=form.email.data)
+        u.set_password(form.password.data)
+        db.session.add(u)
+        db.session.commit()
+        flash('You registered successfully!', 'success')
+        return redirect(url_for('login'))
+    else:
+        return render_template('register.html', form=form)
+
+@app.route('/logout', methods=["GET", "POST"])
+@login_required
+def logout():
+    logout_user()
+    flash('You have logged out!', 'success')
+    return redirect(url_for('chart'))
 
 
 @app.context_processor
