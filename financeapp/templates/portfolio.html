@@ -22,19 +22,37 @@
     {{form.csrf_token}}
     <div id='subforms-container'>
       {% for portfolio_entry in form.holdings %}
-        <div id="holding-{{loop.index0}}-form" class="subform form-row justify-content-center my-row" data-index="{{loop.index0}}">
-          {{portfolio_entry.csrf_token}}
-          <div class ="form-group col-4 my-col">
-          <!--{{portfolio_entry.ticker.label}}--> {{portfolio_entry.ticker(class='form-control')}}
+      <div id="holding-{{loop.index0}}-form" class="subform form-row justify-content-center my-row" data-index="{{loop.index0}}">
+        {{portfolio_entry.csrf_token}}
+            <div class ="form-group col-4 my-col">
+              {% if portfolio_entry.ticker.errors %}
+                {{portfolio_entry.ticker(class='form-control is-invalid')}}
+                <div class='invalid-feedback'>
+                  {% for error in portfolio_entry.ticker.errors %}
+                    {{error}}
+                  {% endfor %}
+                </div>
+              {% else %}
+            <!--{{portfolio_entry.ticker.label}}--> {{portfolio_entry.ticker(class='form-control')}}
+              {% endif %}
+            </div>
+            <div class = "form-group col-4 my-col">
+              {% if portfolio_entry.shares.errors %}
+                {{portfolio_entry.shares(class='form-control is-invalid')}}
+                <div class='invalid-feedback'>
+                  {% for error in portfolio_entry.shares.errors %}
+                    {{error}}
+                  {% endfor %}
+                </div>
+              {% else %}
+            <!--{{portfolio_entry.shares.label}}--> {{portfolio_entry.shares(class='form-control')}}
+              {% endif %}
+            </div>
+            <button type='button' class='remove form-control col-2 btn btn-primary my-col'>Remove Holding</button>
+            <!--<a class="remove" href="#">Remove Holding</a>-->
           </div>
-          <div class = "form-group col-4 my-col">
-          <!--{{portfolio_entry.shares.label}}--> {{portfolio_entry.shares(class='form-control')}}
-          </div>
-          <button type='button' class='remove form-control col-2 btn btn-primary my-col'>Remove Holding</button>
-          <!--<a class="remove" href="#">Remove Holding</a>-->
-        </div>
+      </div>
       {% endfor %}
-    </div>
     <div class="form-row">
       <div class='form-group col-2 offset-1'>
         {{form.submit(class='btn btn-primary')}}
@@ -42,7 +60,6 @@
       <div class='form-group col-2'>
         <button type='button' class='btn btn-primary' id='add'>Add Holding</button>
       </div>
-
     </div>
   </form>
 </div>
@@ -53,11 +70,11 @@
   <input id = "holdings-_-csrf_token" name = "holdings-_-csrf_token" type="hidden" value="">
   <!--<label for="holdings-_-ticker">Ticker Symbol</label><-->
   <div class="form-group col-4">
-  <input class='form-control'id="holdings-_-ticker" name="holdings-_-ticker" type="text" value="">
+    <input class='form-control'id="holdings-_-ticker" name="holdings-_-ticker" type="text" value="">
   </div>
   <!--<label for="holdings-_-shares"></label>-->
   <div class='form-group col-4'>
-  <input class='form-control' id="holdings-_-shares" name="holdings-_-shares" type="text">
+    <input class='form-control' id="holdings-_-shares" name="holdings-_-shares" type="text">
   </div>
   <!--<input type='button' class='remove form-group col-sm-1 btn btn-primary' value='Remove Holding'>-->
 
