@@ -2,10 +2,26 @@
 <html lang="en">
 <header>
     <nav class='navbar navbar-expand-lg navbar-light bg-light'>
-        <ul class='navbar-nav mr-auto'>
-        <li class='nav-item'><a class ='nav-link' href="/chart">Chart</a></li>
-        <li class = 'nav-item'><a class = 'nav-link' href="/portfolio">Portfolio Risk Assesment</a></li>
+      <div class='container'>
+        <a class='navbar-brand' href='/'>Nate's Finance App</a>
+        <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarToggle' aria-controls='navbarToggle' aria-expanded='false' aria-label='Toggle Navigation'>
+            <span class='navbar-toggler-icon'></span>
+        </button>
+        <div class="collapse navbar-collapse" id='navbarToggle'>
+          <div class='navbar-nav'>
+            <a class = 'nav-item nav-link' href="/portfolio">Portfolio Risk Assesment</a>
+            <a class ='nav-link' href="/chart">Chart</a>
+          </div>
+          <div class='navbar-nav ml-auto'>
+            <a class='nav-link' href='/register'>Register</a>
+            <a class='nav-link' href='/login'>Login</a>
+            {% if current_user.is_authenticated %}
+              <a class='nav-link' href='/logout'>Logout</a>
+            {% endif %}
+          </div>
         </div>
+      </div>
+    </nav>
 </header>
 <head>
     <title> {{ test }} </title>
@@ -24,6 +40,15 @@
 
 </head>
 <body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class='alert alert-{{ category }}'>
+          {{message}}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 {% block content %}
 <main role='main' class="container">
     <h1>Standard layout content</h1>
