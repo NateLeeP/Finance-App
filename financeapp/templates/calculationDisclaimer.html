@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<h3 class='text-center font-less-bold'>How we calculate</h3>
+<p class='text-center'>Our calculations for expected portfolio return are based of the <a href='https://www.investopedia.com/terms/c/capm.asp'>Capital Asset Pricing Model</a> The CAPM calculates the expected return based on a combination of the the underlying portfolio's market return and beta. In this scenario, the expected market return is equivalent to the peak-to-trough decline of the S&P500 during the 2007-2009 Financial Crisis. The portfolio beta is calculated by retrieivng up-to-date beta information for individual securities. Portfolio beta is the market capitalization weighted sum of the individual security betas. Your portfolio beta is then used to calculate an expected portfolio return given the expected market return. The higher the beta, the more volatile the portfolio will be compared to the overall market. For more information on the beta, click here.</p>
+
+<p class='text-center'>The portfolio beta is also used when estimate your recovery time.</p>
+
+
+{% endblock content %}

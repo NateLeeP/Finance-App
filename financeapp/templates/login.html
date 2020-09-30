@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<h4 class=' text-center text-muted font-less-bold'>Login</h4>
+
+<div class='container'>
+  <form method='Post'>
+    {{form.hidden_tag()}}
+    <div class='form-group'>
+      {{form.email.label}}
+      {% if form.email.errors %}
+        {{form.email(class='form-control is-invalid')}}
+        <div class='invalid-feedback'>
+          {% for error in errors %}
+            {{error}}
+          {% endfor %}
+        </div>
+      {% else %}
+        {{form.email(class='form-control')}}
+      {% endif %}
+    </div>
+    <div class='form-group'>
+      {{form.password.label}}
+      {% if form.password.errors %}
+        {{form.password(class='form-control is-invalid')}}
+        <div class='invalid-feedback'>
+          {% for error in errors %}
+            {{error}}
+          {% endfor %}
+        </div>
+      {% else %}
+        {{form.password(class='form-control')}}
+      {% endif %}
+    </div>
+    <div class='form-group'>
+      {{form.submit(class='btn btn-primary')}}
+    </div>
+  </form>
+</div>
+
+
+{% endblock content %}
