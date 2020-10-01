@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from financeapp.models import User
-from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FieldList, FormField, PasswordField
+from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FieldList, FormField, PasswordField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, EqualTo
 import requests
@@ -23,6 +23,7 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 
@@ -52,8 +53,11 @@ class PortfolioEntry(FlaskForm):
             raise ValidationError(ticker.data + ' does not exist.')
 
 class PortfolioHoldings(FlaskForm):
+
     holdings = FieldList(FormField(PortfolioEntry), validators=[DataRequired()], min_entries=1)
     submit = SubmitField('Submit Holdings')
+
+
 
 
 
