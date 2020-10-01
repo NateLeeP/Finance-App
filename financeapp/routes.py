@@ -10,148 +10,23 @@ import random
 import datetime
 import logging
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 # Testing chart, not to be used as home page.
-@app.route('/home', methods=['GET', 'POST'])
-def home():
-    stock1 = 'TSLA'
-    stock2 = 'GOOG'
-    test = 'GOOG'
-    date = 'Aug {}, 2020'
-    labels = [date.format(i) for i in range(1, 31)]
-    data = [random.uniform(-2, 2) for i in range(1, 31)]
-    data2 = [random.uniform(-2, 2) for i in range(1, 31)]
-    return render_template('home.html', title="Home", legend=test, data=data, data2=data2, labels=labels, stock1=stock1, stock2=stock2)
+#@app.route('/home', methods=['GET', 'POST'])
+#def home():
+#    stock1 = 'TSLA'
+#    stock2 = 'GOOG'
+#    test = 'GOOG'
+#    date = 'Aug {}, 2020'
+#    labels = [date.format(i) for i in range(1, 31)]
+#    data = [random.uniform(-2, 2) for i in range(1, 31)]
+#    data2 = [random.uniform(-2, 2) for i in range(1, 31)]
+#    return render_template('home.html', title="Home", legend=test, data=data, data2=data2, labels=labels, stock1=stock1, stock2=stock2)
 
 
 
-@app.context_processor
-def utility_processor():
-    def scale_unit(timeFrame):
-        if (timeFrame == '1mo' or timeFrame == '5d'):
-            return 'day'
-        elif (timeFrame == 'ytd' or timeFrame == '6mo' or timeFrame == '1y'):
-            return 'month'
-        else:
-            return 'year'
 
-    return dict(scale_unit=scale_unit)
-
-@app.route('/')
-@app.route('/chart', methods=["POST", "GET"])
-def chart():
-    form = StockForm()
-    if form.validate_on_submit(): #Validate wtf_forms validators
-        #    if form.timeFrame.data == 'custom':
-        #    return redirect(url_for('customTime')
-        return render_template('chart.html', title='Chart', form=form)
-
-    else:
-        form.ticker1.data = "TSLA"
-        form.ticker2.data = "GOOG"
-        form.timeFrame.data = "ytd"
-        return render_template('chart.html', title='Chart', form=form)
-
-@app.route('/portfolio', methods=["POST", "GET"])
-def portfolio():
-    #holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
-    form=PortfolioHoldings()
-    if request.method == 'GET':
-        logger.info('Hello')
-        if current_user.is_authenticated:
-            u = User.query.filter_by(id=current_user.get_id()).first()
-            if u.portfolios:
-                p = u.portfolios.first()
-                form = PortfolioHoldings(obj = p)
-        return render_template('portfolio.html', title='Portfolio',form=form)
-    #if current_user.is_authenticated:
-    #  u = User.query.filter_by(id=current_user.get_id()).first()
-    #  if u.portfolios.first() is not None:
-    #    p = u.portfolios.first()
-    #    form = PortfolioHoldings(obj=p)
-    #  else:
-    #      p = Portfolio(investor=u)
-    #      form = PortfolioHoldings(obj=p)
-    if form.validate_on_submit():
-      if current_user.is_authenticated:
-        u = User.query.filter_by(id=current_user.get_id()).first()
-        p = u.portfolios.first()
-        for holding in p.holdings.all():
-          db.session.delete(holding)
-        for holding in form.holdings:
-          h = Holding(ticker=holding.ticker.data, shares=holding.shares.data, portfolio=p)
-          db.session.add(h)
-        db.session.commit()
-      tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
-      betaFunctions.updateTickerList(tickers)
-      calculations = betaFunctions.portfolioCalculations(tickers)
-      return render_template('portfoliotest.html', form=form, betas=tickers, calculations=calculations)
-    else:
-        return render_template('portfolio.html', title='Portfolio', form=form)
-
-@app.route('/disclaimer', methods=["GET"])
-def disclaimer():
-    return render_template('calculationDisclaimer.html')
-
-@app.route('/login', methods=["GET", "POST"])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('chart'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        u = User.query.filter_by(email=form.email.data).first()
-        if u and u.check_password(form.password.data):
-            login_user(u, remember=form.remember.data)
-            flash("You have logged in successfully!", "success")
-            return redirect(url_for('chart'))
-        else:
-            flash('Invalid email or password', 'danger')
-            #return redirect(url_for('login'))
-    return render_template('login.html', form=form)
-
-@app.route('/register', methods=["GET", "POST"])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('chart'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        u = User(username=form.username.data, email=form.email.data)
-        u.set_password(form.password.data)
-        db.session.add(u)
-        db.session.commit()
-        flash('You registered successfully!', 'success')
-        return redirect(url_for('login'))
-    else:
-        return render_template('register.html', form=form)
-
-@app.route('/logout', methods=["GET", "POST"])
-@login_required
-def logout():
-    logout_user()
-    flash('You have logged out!', 'success')
-    return redirect(url_for('chart'))
-
-@app.route('/test', methods=['GET', "POST"])
-@login_required
-def test():
-    u = User.query.filter_by(id=current_user.get_id()).first()
-    p = u.portfolios.first()
-
-    form = PortfolioHoldings(obj=p)
-    return render_template('test.html', form=form)
-
-@app.context_processor
-def stock_date_processor():
-    def stock_dates_combine(ticker, timeFrame='ytd', start=None, end=None):
-        return stock_prices.stock_dates_combine(ticker, timeFrame, start, end)
-    return dict(stock_dates_combine=stock_dates_combine)
-
-@app.context_processor
-def stock_price_processor():
-    def stock_prices_combine(ticker, timeFrame='ytd', start=None, end=None):
-        return stock_prices.stock_prices_combine(ticker, timeFrame, start, end) # 08.24.2020 Notice: Do not have to pass the defaults a second time!!
-    return dict(stock_prices_combine=stock_prices_combine)
 
 
 """
