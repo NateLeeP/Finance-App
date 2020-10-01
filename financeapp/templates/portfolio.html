@@ -61,6 +61,12 @@
         <button type='button' class='btn btn-primary' id='add'>Add Holding</button>
       </div>
     </div>
+      {% if current_user.is_authenticated %}
+        <div class='form-check'>
+          {{form.save_portfolio(class='form-check-input')}}
+          {{form.save_portfolio.label(class='form-check-label')}}
+        </div>
+      {% endif %}
   </form>
 </div>
 <!--<a class = "row justify-content-center" id="add" href="#">Add Holding</a>-->
