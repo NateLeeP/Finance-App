@@ -1,6 +1,6 @@
 from financeapp import app, db
 from financeapp.models import User, Portfolio, Holding
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from financeapp import stock_prices
 from financeapp import betaFunctions
@@ -8,6 +8,9 @@ from financeapp.forms import StockForm, PortfolioHoldings, RegistrationForm, Log
 from financeapp import dateLookUp
 import random
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Testing chart, not to be used as home page.
 @app.route('/home', methods=['GET', 'POST'])
@@ -52,22 +55,38 @@ def chart():
 
 @app.route('/portfolio', methods=["POST", "GET"])
 def portfolio():
-    holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
-
-    if current_user.is_authenticated:
-        u = User.query.filter_by(id=current_user.get_id()).first()
-        if u.portfolios.first() is not None:
-            p = u.portfolios.first()
-            for holding in p.holdings.all():
-                form.holdings.append_entry({'ticker':holding.ticker, 'shares':holding.shares})
-
-    form = PortfolioHoldings()
-    form.holdings[0]
+    #holdings = [{'ticker':'TSLA','shares':20}, {'ticker':'GOOG', 'shares':40}]
+    form=PortfolioHoldings()
+    if request.method == 'GET':
+        logger.info('Hello')
+        if current_user.is_authenticated:
+            u = User.query.filter_by(id=current_user.get_id()).first()
+            if u.portfolios:
+                p = u.portfolios.first()
+                form = PortfolioHoldings(obj = p)
+        return render_template('portfolio.html', title='Portfolio',form=form)
+    #if current_user.is_authenticated:
+    #  u = User.query.filter_by(id=current_user.get_id()).first()
+    #  if u.portfolios.first() is not None:
+    #    p = u.portfolios.first()
+    #    form = PortfolioHoldings(obj=p)
+    #  else:
+    #      p = Portfolio(investor=u)
+    #      form = PortfolioHoldings(obj=p)
     if form.validate_on_submit():
-        tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
-        betaFunctions.updateTickerList(tickers)
-        calculations = betaFunctions.portfolioCalculations(tickers)
-        return render_template('portfoliotest.html', form=form, betas=tickers, calculations=calculations)
+      if current_user.is_authenticated:
+        u = User.query.filter_by(id=current_user.get_id()).first()
+        p = u.portfolios.first()
+        for holding in p.holdings.all():
+          db.session.delete(holding)
+        for holding in form.holdings:
+          h = Holding(ticker=holding.ticker.data, shares=holding.shares.data, portfolio=p)
+          db.session.add(h)
+        db.session.commit()
+      tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
+      betaFunctions.updateTickerList(tickers)
+      calculations = betaFunctions.portfolioCalculations(tickers)
+      return render_template('portfoliotest.html', form=form, betas=tickers, calculations=calculations)
     else:
         return render_template('portfolio.html', title='Portfolio', form=form)
 
@@ -77,11 +96,13 @@ def disclaimer():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('chart'))
     form = LoginForm()
     if form.validate_on_submit():
         u = User.query.filter_by(email=form.email.data).first()
         if u and u.check_password(form.password.data):
-            login_user(u)
+            login_user(u, remember=form.remember.data)
             flash("You have logged in successfully!", "success")
             return redirect(url_for('chart'))
         else:
@@ -91,6 +112,8 @@ def login():
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('chart'))
     form = RegistrationForm()
     if form.validate_on_submit():
         u = User(username=form.username.data, email=form.email.data)
@@ -109,6 +132,14 @@ def logout():
     flash('You have logged out!', 'success')
     return redirect(url_for('chart'))
 
+@app.route('/test', methods=['GET', "POST"])
+@login_required
+def test():
+    u = User.query.filter_by(id=current_user.get_id()).first()
+    p = u.portfolios.first()
+
+    form = PortfolioHoldings(obj=p)
+    return render_template('test.html', form=form)
 
 @app.context_processor
 def stock_date_processor():
