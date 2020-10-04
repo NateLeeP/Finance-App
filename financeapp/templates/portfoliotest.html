@@ -4,6 +4,70 @@
 <h2 class='text-center font-less-bold'>2008 Financial Crisis</h2>
 <p class='text-center'>From a high on October 9th, 2007, the S&P 500 fell 56% before bottoming out on March 8th, 2009. Based on latest price estimates, your portfolio is worth <span class='font-bold'>{{calculations['startTotalPortfolioValue']}} </span>. If we experienced a similar market decline, your portfolio would drop <span class='color-red font-bold'>{{calculations['totalExpectedReturn']}}% </span>, for a new portfolio value of <span class='font-bold'>{{calculations['endTotalPortfolioValue']}}</span>. In order to return to your previous portfolio value of <span class='font-bold'>{{calculations['startTotalPortfolioValue']}}</span>, your portfolio would need to return <span class='font-bold'>{{calculations['requiredReturn']}}%</span>. Based on the 2008 Financial Crisis recover, you would return to previous values on or around <span class='font-bold'>{{calculations['recoveryDate']}}</span> (approximately <span>{{calculations['daysToRecover']}} </span> days). </p>
 
+<div class='container'>
+  <div>
+    <canvas id="myChart" width="400" height="400" class='mx-auto'></canvas>
+  </div>
+</div>
+
+
 <p> Click <a href= '/disclaimer'> here</a> for our disclaimer</p>
+
+<script>
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var startPortfolioValue = Number("{{calculations['startTotalPortfolioValue']}}".replace('$','').replace(',',''));
+  var endPortfolioValue = Number("{{calculations['endTotalPortfolioValue']}}".replace('$','').replace(',',''));
+  // data
+  var myPie = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: ["Portfolio Loss","Portfolio Remaining"],
+    datasets: [{
+      backgroundColor: ["red","green"],
+      data: [startPortfolioValue-endPortfolioValue, endPortfolioValue]
+    }],
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Impact of Financial Crisis',
+      fontStyle: 'bold',
+      fontSize: 20
+    },
+    responsive:false,
+    tooltips: {
+      callbacks: {
+        // this callback is used to create the tooltip label
+        label: function(tooltipItem, data) {
+          // get the data label and data value to display
+          // convert the data value to local string so it uses a comma seperated number
+          var dataLabel = data.labels[tooltipItem.index];
+          var value = ': $' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toLocaleString();
+
+          // make this isn't a multi-line label (e.g. [["label 1 - line 1, "line 2, ], [etc...]])
+          if (Chart.helpers.isArray(dataLabel)) {
+            // show value on first line of multiline label
+            // need to clone because we are changing the value
+            dataLabel = dataLabel.slice();
+            dataLabel[0] += value;
+          } else {
+            dataLabel += value;
+          }
+
+          // return the text to display on the tooltip
+          return dataLabel;
+        }
+      }
+    }
+  }
+});
+
+
+
+
+
+
+</script>
+
 
 {% endblock content %}
