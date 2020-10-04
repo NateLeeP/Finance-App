@@ -42,8 +42,10 @@ def portfolio():
           db.session.add(h)
         db.session.commit()
       tickers = [{'Ticker':subform.ticker.data, 'Shares':subform.shares.data} for subform in form.holdings]
-      betaFunctions.updateTickerList(tickers)
-      calculations = betaFunctions.portfolioCalculations(tickers)
+      betaFunctions.updateTickerList(tickers, -56)
+      calculations = betaFunctions.portfolioCalculations(tickers, True)
+      #betaFunctions.getCAPM(tickers, -34)
+      #new_calculations = betaFunctions.portfolioCalculations(tickers, False)
       return render_template('portfoliotest.html', form=form, betas=tickers, calculations=calculations)
     else:
         return render_template('portfolio.html', title='Portfolio', form=form)

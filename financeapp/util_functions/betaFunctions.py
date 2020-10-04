@@ -72,23 +72,22 @@ def calculateRequiredReturn(new_portfolio_value, old_portfolio_value):
   requiredReturn *= 100
   return requiredReturn
 
-def updateTickerList(tickers):
+def updateTickerList(tickers, market_decline):
   # Calculate beta, market value, portfolio percentage, and expected return
   getMultipleBeta(tickers)
   getMultiplePrice(tickers)
   getPortfolioPercentage(tickers, getPortfolioValue(tickers))
-  getCAPM(tickers, -56)
-
+  getCAPM(tickers, market_decline)
   return tickers
 
-def portfolioCalculations(tickers):
+def portfolioCalculations(tickers, isFinancialCrisis):
   # Calculate (and store) expected return, beginning and ending portfolio value, required return, and days to recover
   calculations = {}
   totalExpectedReturn = float(portfolioExpectedReturn(tickers))
   endTotalPortfolioValue = getPortfolioValue(tickers) * (1 + (totalExpectedReturn/100))
   startTotalPortfolioValue= getPortfolioValue(tickers)
   requiredReturn = calculateRequiredReturn(startTotalPortfolioValue, endTotalPortfolioValue)
-  daysToRecover = dl.daysLookUp(requiredReturn, 1.2)
+  daysToRecover = dl.daysLookUp(requiredReturn, getPortfolioBeta(tickers), isFinancialCrisis)
   calculations['totalExpectedReturn'] = '{:.2f}'.format(totalExpectedReturn)
   calculations['endTotalPortfolioValue'] = '${:,.2f}'.format(endTotalPortfolioValue)
   calculations['startTotalPortfolioValue'] = '${:,.2f}'.format(startTotalPortfolioValue)

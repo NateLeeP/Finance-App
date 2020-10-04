@@ -37,23 +37,42 @@ def adjustPriceArrayFunc(beta):
   return adjustedPriceArray
 
 
-def daysLookUp(required_return, portfolio_beta):
+def daysLookUp(required_return, portfolio_beta, isFinancialCrisis):
   date = ''
-  adjustPriceArray = copy.deepcopy(price_array)
-  # 'deepcopy' ensures dictionairies in list are copied. Need to copy, python passes everything by reference.
-  print(price_array[:5])
-  for i in range(len(adjustPriceArray)):
-    adjustPriceArray[i]['Change'] *= portfolio_beta
-  for i in range(len(adjustPriceArray)):
-    if adjustPriceArray[i]['Change'] > required_return:
-      date = convertToDate(adjustPriceArray[i]['Date'])
-      break
-  del adjustPriceArray
-  return (date - datetime.date(2009, 3, 8)).days
+  if isFinancialCrisis:
+
+    adjustPriceArray= copy.deepcopy(price_array)
+    # 'deepcopy' ensures dictionairies in list are copied. Need to copy, python passes everything by reference.
+    for i in range(len(adjustPriceArray)):
+     adjustPriceArray[i]['Change'] *= portfolio_beta
+    for i in range(len(adjustPriceArray)):
+      if adjustPriceArray[i]['Change'] > required_return:
+        date = convertToDate(adjustPriceArray[i]['Date'])
+        break
+    del adjustPriceArray
+    return (date - datetime.date(2009, 3, 8)).days
+  # Work in progress. Attempting to add 2020 crash as part of Risk analysis.
+  else:
+    adjustPriceArray = filter(lambda x: x['Date'] >= '2020-03-23', price_array)
+    for i in range(len(adjustPriceArray)):
+     adjustPriceArray[i]['Change'] *= portfolio_beta
+    for i in range(len(adjustPriceArray)):
+      if adjustPriceArray[i]['Change'] > required_return:
+        date = convertToDate(adjustPriceArray[i]['Date'])
+        break
+    del adjustPriceArray
+    if date == '':
+      date = 'Not recovered yet!'
+      return date
+    else:
+      return (date - datetime.date(2020, 3, 20)).days
 
 def recoveryDate(days):
   # Accepts recovery days and returns date of recovery (as string)
-  return (datetime.date.today() + datetime.timedelta(days=days)).strftime("%B %d, %Y")
+  if isinstance(days, int) is False:
+    return days
+  else:
+    return (datetime.date.today() + datetime.timedelta(days=days)).strftime("%B %d, %Y")
 
 def test():
   print(price_array[:5])
