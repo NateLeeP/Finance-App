@@ -20,12 +20,12 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 from financeapp.chart.routes import chart_blueprint
 from financeapp.portfolio.routes import portfolio_blueprint
 from financeapp.users.routes import users
-from financeapp.test.routes import test_blueprint
+# from financeapp.test.routes import test_blueprint
 
 app.register_blueprint(chart_blueprint)
 app.register_blueprint(portfolio_blueprint)
 app.register_blueprint(users)
-app.register_blueprint(test_blueprint)
+# app.register_blueprint(test_blueprint)
 
 
 #from financeapp import routes, models
