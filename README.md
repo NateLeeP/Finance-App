@@ -35,5 +35,5 @@ Application will be running at [http://127.0.0.1:5000](http://127.0.0.1:5000/)
  
  
 ## Deployment
-Deployed using AWS EC2. Deployed at [3.131.83.225](http://3.131.83.225/)
+Deployed using AWS EC2, gUnicorn, and nGinx. Deployed at [3.14.3.25](http://3.14.3.25/)
  
